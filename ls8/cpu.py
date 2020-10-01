@@ -2,12 +2,36 @@
 
 import sys
 
+# Instruction Constants
+LDI = 0b10000010
+PRN = 0b01000111    # Print
+HLT = 0b00000001    # Halt
+MUL = 0b10100010    # Multiply
+ADD = 0b10100000    # Addition
+PUSH = 0b01000101   # Push in stack
+POP = 0b01000110    # Pop from stack
+CALL = 0b01010000
+RET = 0b00010001
+
 class CPU:
     """Main CPU class."""
 
     def __init__(self):
         """Construct a new CPU."""
-        pass
+        self.pc = 0
+        self.ram = [0] * 256
+        self.reg =[0] * 8
+        self.running = True
+
+    def ram_read(self, mar):
+        try:
+            mdr = self.ram[mar]
+        except:
+            mdr = None
+        return mdr
+
+    def ram_write(self, mdr, mar):
+        self.ram[mar] = mdr
 
     def load(self):
         """Load a program into memory."""
@@ -62,4 +86,19 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        pass
+        while self.run:
+            ir = self.ram_read(self.pc)
+            operand_a = self.ram_read(self.pc+1)
+            operand_b = self.ram_read(self.pc+2)
+
+            if ir == HLT:
+                self.run = False
+            elif ir == LDI:
+                self.reg[operand_a] = operand_b
+                self.pc += 3
+            elif ir == PRN:
+                print(self.reg[operand_a])
+                self.pc += 2
+            else:
+                print("ERROR: Unknown command.")
+                sys.exit(1)
