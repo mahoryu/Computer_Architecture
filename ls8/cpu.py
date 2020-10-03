@@ -108,15 +108,12 @@ class CPU:
 
     def handle_LDI(self, a, b):
         self.reg[a] = b
-        self.pc += 3
 
     def handle_PRN(self, a, b):
         print(self.reg[a])
-        self.pc += 2
 
     def handle_MUL(self, a, b):
         self.reg[a] = self.reg[a] * self.reg[b]
-        self.pc += 3
 
     def run(self):
         """Run the CPU."""
@@ -125,8 +122,13 @@ class CPU:
             operand_a = self.ram_read(self.pc+1)
             operand_b = self.ram_read(self.pc+2)
 
+            # Call the branchtable
             try:
-                self.branchtable[ir](operand_a,operand_b)
+                self.branchtable[ir](operand_a, operand_b)
             except:
                 print("ERROR: Unknown command.")
                 sys.exit(1)
+
+            # Use bit shifting to advance the pc
+            advance = ir >> 6
+            self.pc += advance + 1
