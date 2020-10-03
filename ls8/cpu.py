@@ -3,15 +3,14 @@
 import sys
 
 # Instruction Constants
+HLT  = 0b00000001    # Halt
 LDI  = 0b10000010
 PRN  = 0b01000111    # Print
-HLT  = 0b00000001    # Halt
 MUL  = 0b10100010    # Multiply
 ADD  = 0b10100000    # Addition
-PUSH = 0b01000101   # Push in stack
-POP  = 0b01000110    # Pop from stack
-CALL = 0b01010000
-RET  = 0b00010001
+SUB  = 0b10100001    # Subtraction
+DIV  = 0b10100011    # Division
+MOD  = 0b10100100    # Modulous
 
 class CPU:
     """Main CPU class."""
@@ -29,6 +28,10 @@ class CPU:
         self.branchtable[LDI] = self.handle_LDI
         self.branchtable[PRN] = self.handle_PRN
         self.branchtable[MUL] = self.handle_MUL
+        self.branchtable[ADD] = self.handle_ADD
+        self.branchtable[SUB] = self.handle_SUB
+        self.branchtable[DIV] = self.handle_DIV
+        self.branchtable[MOD] = self.handle_MOD
 
     def ram_read(self, mar):
         try:
@@ -103,6 +106,8 @@ class CPU:
 
         print()
 
+    ######Function Handling######
+
     def handle_HLT(self, a, b):
         self.halted = True
 
@@ -114,6 +119,26 @@ class CPU:
 
     def handle_MUL(self, a, b):
         self.reg[a] = self.reg[a] * self.reg[b]
+
+    def handle_ADD(self, a, b):
+        self.reg[a] = self.reg[a] + self.reg[b]
+
+    def handle_SUB(self, a, b):
+        self.reg[a] = self.reg[a] - self.reg[b]
+
+    def handle_DIV(self, a, b):
+        if self.reg[b] == 0:
+            print("ERROR: Cannot devide by zero.")
+        else:
+            self.reg[a] = self.reg[a] / self.reg[b]
+
+    def handle_MOD(self, a, b):
+        if self.reg[b] == 0:
+            print("ERROR: Cannot devide by zero.")
+        else:
+            self.reg[a] = self.reg[a] % self.reg[b]
+
+    #############################
 
     def run(self):
         """Run the CPU."""
