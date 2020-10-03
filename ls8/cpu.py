@@ -9,9 +9,9 @@ HLT  = 0b00000001    # Halt
 MUL  = 0b10100010    # Multiply
 ADD  = 0b10100000    # Addition
 PUSH = 0b01000101   # Push in stack
-POP = 0b01000110    # Pop from stack
+POP  = 0b01000110    # Pop from stack
 CALL = 0b01010000
-RET = 0b00010001
+RET  = 0b00010001
 
 class CPU:
     """Main CPU class."""
@@ -112,6 +112,10 @@ class CPU:
             elif ir == PRN:
                 print(self.reg[operand_a])
                 self.pc += 2
+            elif ir == MUL:
+                product = self.reg[operand_a] * self.reg[operand_b]
+                self.reg[operand_a] = product
+                self.pc += 3
             else:
                 print("ERROR: Unknown command.")
                 sys.exit(1)
