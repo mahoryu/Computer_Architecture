@@ -46,20 +46,15 @@ class CPU:
     def ram_write(self, mdr, mar):
         self.ram[mar] = mdr
 
-    def load(self):
+    def load(self,filename):
         """Load a program into memory."""
 
         address = 0
         program = []
 
-        # make sure the correct number of args are passed in
-        if len(sys.argv) != 2:
-            print('Wrong number of arguments.')
-            sys.exit(1)
-
         # get only the binary numbers
         try:
-            with open(sys.argv[1]) as f:
+            with open(filename) as f:
                 for line in f:
                     # split on the comment to make numbers accecible
                     comment_split = line.split("#")
