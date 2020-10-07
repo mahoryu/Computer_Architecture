@@ -10,8 +10,9 @@ MUL  = 0b10100010    # Multiply
 ADD  = 0b10100000    # Addition
 SUB  = 0b10100001    # Subtraction
 DIV  = 0b10100011    # Division
-MOD  = 0b10100100    # Modulous
-
+MOD  = 0b10100100    # Modupasslous
+PUSH = 0b01000101
+POP  = 0b01000110
 class CPU:
     """Main CPU class."""
 
@@ -24,14 +25,16 @@ class CPU:
         self.halted = False
         # set up the branchtable
         self.branchtable = {}
-        self.branchtable[HLT] = self.handle_HLT
-        self.branchtable[LDI] = self.handle_LDI
-        self.branchtable[PRN] = self.handle_PRN
-        self.branchtable[MUL] = self.handle_MUL
-        self.branchtable[ADD] = self.handle_ADD
-        self.branchtable[SUB] = self.handle_SUB
-        self.branchtable[DIV] = self.handle_DIV
-        self.branchtable[MOD] = self.handle_MOD
+        self.branchtable[HLT]  = self.handle_HLT
+        self.branchtable[LDI]  = self.handle_LDI
+        self.branchtable[PRN]  = self.handle_PRN
+        self.branchtable[MUL]  = self.handle_MUL
+        self.branchtable[ADD]  = self.handle_ADD
+        self.branchtable[SUB]  = self.handle_SUB
+        self.branchtable[DIV]  = self.handle_DIV
+        self.branchtable[MOD]  = self.handle_MOD
+        self.branchtable[PUSH] = self.handle_PUSH
+        self.branchtable[POP]  = self.handle_POP
 
     def ram_read(self, mar):
         try:
@@ -137,6 +140,14 @@ class CPU:
             print("ERROR: Cannot devide by zero.")
         else:
             self.reg[a] = self.reg[a] % self.reg[b]
+
+    def handle_PUSH(self, a, b):
+        self.reg[7] -= 1
+        self.ram[self.reg[7]] = self.reg[a]
+
+    def handle_POP(self, a, b):
+        self.reg[a] = self.ram[self.reg[7]]
+        self.reg[7] += 1
 
     #############################
 
