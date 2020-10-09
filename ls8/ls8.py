@@ -13,4 +13,7 @@ if len(sys.argv) != 2:
 cpu = CPU()
 
 cpu.load(sys.argv[1])
+# Hard coding for debugging
+# cpu.load("ls8/examples/call.ls8")
+
 cpu.run()

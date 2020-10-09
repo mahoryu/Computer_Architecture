@@ -10,9 +10,14 @@ MUL  = 0b10100010    # Multiply
 ADD  = 0b10100000    # Addition
 SUB  = 0b10100001    # Subtraction
 DIV  = 0b10100011    # Division
-MOD  = 0b10100100    # Modupasslous
+MOD  = 0b10100100    # Modulous
 PUSH = 0b01000101
 POP  = 0b01000110
+CALL = 0b01010000    # Call a Subroutine
+RET  = 0b00010001    # Return
+
+SP = 7    # Register for the Stack Pointer
+
 class CPU:
     """Main CPU class."""
 
@@ -21,7 +26,7 @@ class CPU:
         self.pc = 0
         self.ram = [0] * 256
         self.reg =[0] * 8
-        self.reg[7] = 0xF4
+        self.reg[SP] = 0xF4
         self.halted = False
         # set up the branchtable
         self.branchtable = {}
@@ -35,6 +40,8 @@ class CPU:
         self.branchtable[MOD]  = self.handle_MOD
         self.branchtable[PUSH] = self.handle_PUSH
         self.branchtable[POP]  = self.handle_POP
+        self.branchtable[CALL]  = self.handle_CALL
+        self.branchtable[RET]  = self.handle_RET
 
     def ram_read(self, mar):
         try:
@@ -137,12 +144,24 @@ class CPU:
             self.reg[a] = self.reg[a] % self.reg[b]
 
     def handle_PUSH(self, a, b):
-        self.reg[7] -= 1
-        self.ram[self.reg[7]] = self.reg[a]
+        self.reg[SP] -= 1
+        self.ram[self.reg[SP]] = self.reg[a]
 
     def handle_POP(self, a, b):
-        self.reg[a] = self.ram[self.reg[7]]
-        self.reg[7] += 1
+        self.reg[a] = self.ram[self.reg[SP]]
+        self.reg[SP] += 1
+
+    def handle_CALL(self, a, b):
+        # store the address of the instruction after call
+        self.reg[SP] -= 1
+        self.ram[self.reg[SP]] = self.pc + 2
+        # set the pc to the new address
+        self.pc = self.reg[a]
+
+    def handle_RET(self, a, b):
+        # set pc to the value popped off the top of the stack
+        self.pc = self.ram[self.reg[SP]]
+        self.reg[SP] += 1
 
     #############################
 
@@ -160,6 +179,12 @@ class CPU:
                 print("ERROR: Unknown command.")
                 sys.exit(1)
 
-            # Use bit shifting to advance the pc
-            advance = ir >> 6
-            self.pc += advance + 1
+            # use bit masking and shifting to ignore the pc advance
+            # if the pc is set directly
+            pc_setter = (ir & 0b00010000)
+            pc_setter = pc_setter >> 4
+
+            if pc_setter == 0b0:
+                # Use bit shifting to advance the pc
+                advance = ir >> 6
+                self.pc += advance + 1
